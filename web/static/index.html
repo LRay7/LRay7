@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GigHound</title>
+<style>
+  :root {
+    --bg: #14120f; --card: #1e1b16; --ink: #f0ead9; --dim: #9a917d;
+    --accent: #e0a03c; --line: #322d24;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.5 Georgia, 'Times New Roman', serif;
+  }
+  header { padding: 28px 20px 10px; max-width: 720px; margin: 0 auto; }
+  h1 { margin: 0; font-size: 2rem; }
+  h1 .dog { color: var(--accent); }
+  .tagline { color: var(--dim); margin: 4px 0 0; font-style: italic; }
+  main { max-width: 720px; margin: 0 auto; padding: 12px 20px 60px; }
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+    padding: 14px 0; border-bottom: 1px solid var(--line); margin-bottom: 18px;
+  }
+  .controls label { color: var(--dim); font-size: .9rem; }
+  .controls output { color: var(--accent); font-weight: bold; }
+  input[type=range] { accent-color: var(--accent); width: 160px; vertical-align: middle; }
+  .daybtns button {
+    background: none; border: 1px solid var(--line); color: var(--ink);
+    padding: 5px 12px; border-radius: 999px; cursor: pointer; font: inherit; font-size: .85rem;
+  }
+  .daybtns button.on { border-color: var(--accent); color: var(--accent); }
+  .event {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 10px; display: flex; gap: 16px; align-items: baseline;
+  }
+  .when { min-width: 86px; color: var(--accent); font-size: .9rem; }
+  .what { flex: 1; }
+  .who { font-size: 1.05rem; }
+  .who a { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--dim); }
+  .where { color: var(--dim); font-size: .88rem; }
+  .meta { color: var(--dim); font-size: .8rem; text-align: right; white-space: nowrap; }
+  .empty { color: var(--dim); font-style: italic; padding: 30px 0; text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Gig<span class="dog">Hound</span> &#128021;</h1>
+  <p class="tagline">every live show near you — even the ones the big apps miss</p>
+</header>
+<main>
+  <div class="controls">
+    <label>within <output id="radiusOut">25</output> mi
+      <input type="range" id="radius" min="5" max="60" step="5" value="25">
+    </label>
+    <span class="daybtns">
+      <button data-days="1">Tonight</button>
+      <button data-days="3">Next 3 days</button>
+      <button data-days="7" class="on">This week</button>
+      <button data-days="30">This month</button>
+    </span>
+  </div>
+  <div id="list"><p class="empty">loading&hellip;</p></div>
+</main>
+<script>
+  let pos = { lat: 40.685, lon: -80.107 };  // Cranberry Township fallback
+  let days = 7;
+
+  const fmtDate = iso => {
+    const d = new Date(iso + 'T12:00:00');
+    return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  };
+  const fmtTime = t => {
+    if (!t) return '';
+    const [h, m] = t.split(':').map(Number);
+    const ampm = h >= 12 ? 'pm' : 'am';
+    return `${((h + 11) % 12) + 1}:${String(m).padStart(2, '0')}${ampm}`;
+  };
+
+  async function refresh() {
+    const radius = document.getElementById('radius').value;
+    const url = `/api/events?lat=${pos.lat}&lon=${pos.lon}&radius=${radius}&days=${days}`;
+    const list = document.getElementById('list');
+    try {
+      const data = await (await fetch(url)).json();
+      if (!data.events.length) {
+        list.innerHTML = '<p class="empty">no shows found in this range — widen the radius, or the crawler hasn\'t run yet</p>';
+        return;
+      }
+      list.innerHTML = data.events.map(e => `
+        <div class="event">
+          <div class="when">${fmtDate(e.date)}<br>${fmtTime(e.start_time)}</div>
+          <div class="what">
+            <div class="who">${e.url ? `<a href="${e.url}" target="_blank" rel="noopener">` : ''}${e.artist || e.title}${e.url ? '</a>' : ''}</div>
+            <div class="where">${e.venue_name || ''}${e.genre ? ' &middot; ' + e.genre : ''}</div>
+          </div>
+          <div class="meta">${e.distance_miles} mi${e.price ? '<br>' + e.price : ''}</div>
+        </div>`).join('');
+    } catch (err) {
+      list.innerHTML = `<p class="empty">couldn't load events (${err})</p>`;
+    }
+  }
+
+  document.getElementById('radius').addEventListener('input', ev => {
+    document.getElementById('radiusOut').textContent = ev.target.value;
+    refresh();
+  });
+  document.querySelectorAll('.daybtns button').forEach(btn =>
+    btn.addEventListener('click', () => {
+      days = Number(btn.dataset.days);
+      document.querySelectorAll('.daybtns button').forEach(b => b.classList.toggle('on', b === btn));
+      refresh();
+    }));
+
+  navigator.geolocation?.getCurrentPosition(
+    p => { pos = { lat: p.coords.latitude, lon: p.coords.longitude }; refresh(); },
+    () => refresh(),
+    { timeout: 4000 }
+  );
+  refresh();
+</script>
+</body>
+</html>

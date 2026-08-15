@@ -1,0 +1,112 @@
+# Pittsburgh proper — the "easy" tier. Rich venues and aggregated calendars
+# cover hundreds of events with a handful of sources.
+#
+# All URLs are best-effort seeds (verified: false). Run `gighound sources check`.
+
+- id: city-paper
+  name: Pittsburgh City Paper events
+  url: https://www.pghcitypaper.com/pittsburgh/EventSearch?eventCategory=1252391
+  kind: aggregator
+  strategy: html
+  lat: 40.441
+  lon: -79.996
+  notes: The classic alt-weekly listings; strong long-tail coverage.
+
+- id: wyep-calendar
+  name: WYEP Community Calendar
+  url: https://www.wyep.org/community-calendar/
+  kind: aggregator
+  strategy: html
+  lat: 40.441
+  lon: -79.996
+  notes: Public-radio music calendar; curated, music-only.
+
+- id: mr-smalls
+  name: Mr. Smalls Theatre
+  url: https://www.mrsmalls.com/upcoming-events/
+  kind: venue
+  strategy: html
+  lat: 40.481
+  lon: -79.978
+  address: 400 Lincoln Ave, Millvale, PA
+  notes: Converted church; mid-size touring acts.
+
+- id: thunderbird
+  name: Thunderbird Café & Music Hall
+  url: https://thunderbirdmusichall.com/events/
+  kind: venue
+  strategy: html
+  lat: 40.465
+  lon: -79.960
+  address: 4053 Butler St, Lawrenceville, PA
+  notes: Jazz, funk, jam bands nearly every night.
+
+- id: club-cafe
+  name: Club Café
+  url: https://clubcafelive.com/
+  kind: venue
+  strategy: html
+  lat: 40.428
+  lon: -79.984
+  address: 56-58 S 12th St, South Side, PA
+  notes: Intimate singer-songwriter room.
+
+- id: stage-ae
+  name: Stage AE
+  url: https://www.promowestlive.com/pittsburgh/stage-ae
+  kind: venue
+  strategy: html
+  lat: 40.446
+  lon: -80.011
+  address: 400 North Shore Dr, Pittsburgh, PA
+  notes: Big touring shows, indoor/outdoor.
+
+- id: city-winery
+  name: City Winery Pittsburgh
+  url: https://citywinery.com/pittsburgh/pittsburgh-events
+  kind: venue
+  strategy: html
+  lat: 40.450
+  lon: -79.985
+  address: 1627 Smallman St, Strip District, PA
+  notes: Dinner-and-a-show; strong for the over-40 crowd.
+
+- id: roxian
+  name: Roxian Theatre
+  url: https://www.roxiantheatre.com/shows
+  kind: venue
+  strategy: html
+  lat: 40.465
+  lon: -80.061
+  address: 425 Chartiers Ave, McKees Rocks, PA
+  notes: Restored 1,400-cap theater.
+
+- id: oaks-theater
+  name: The Oaks Theater
+  url: https://theoakstheater.com/upcoming-events/
+  kind: venue
+  strategy: html
+  lat: 40.522
+  lon: -79.842
+  address: 310 Allegheny River Blvd, Oakmont, PA
+  notes: Eastern suburbs; tributes and local acts.
+
+- id: allegheny-county-concerts
+  name: Allegheny County summer concerts (Hartwood Acres / South Park)
+  url: https://www.alleghenycounty.us/Services/Parks-and-Events/Summer-Concert-Series
+  kind: calendar
+  strategy: html
+  lat: 40.548
+  lon: -79.906
+  notes: Free summer concert series — exactly the kind of thing Dad wants.
+
+- id: ticketmaster-pgh
+  name: Ticketmaster Discovery API (Pittsburgh music)
+  url: https://app.ticketmaster.com/discovery/v2/events.json?classificationName=music&city=Pittsburgh&stateCode=PA&apikey=${TICKETMASTER_API_KEY}
+  kind: api
+  strategy: api:ticketmaster
+  lat: 40.441
+  lon: -79.996
+  enabled: false
+  notes: Free API key covers the arena/theater tier wholesale. Enable after
+    setting TICKETMASTER_API_KEY; strategy needs env-var substitution (TODO).

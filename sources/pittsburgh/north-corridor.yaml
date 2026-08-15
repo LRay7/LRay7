@@ -1,0 +1,83 @@
+# Cranberry Township / North Hills / Butler County corridor — Dad's backyard.
+# These are the sources the big apps don't index; deepest coverage lives here.
+#
+# All URLs are best-effort seeds (verified: false). Run `gighound sources check`
+# to ping them and fix the ones that have moved before the first real crawl.
+
+- id: jergels
+  name: Jergel's Rhythm Grille
+  url: https://www.jergels.com/events/
+  kind: venue
+  strategy: html
+  lat: 40.654
+  lon: -80.096
+  address: 285 Northgate Dr, Warrendale, PA
+  notes: The anchor live-music venue of the northern suburbs; nightly shows.
+
+- id: strand-theater
+  name: The Strand Theater
+  url: https://www.thestrandtheater.org/events
+  kind: venue
+  strategy: html
+  lat: 40.794
+  lon: -80.137
+  address: 119 N Main St, Zelienople, PA
+  notes: Restored historic theater; touring acts, tribute bands, local performers.
+
+- id: harmony-inn
+  name: The Harmony Inn
+  url: https://historicharmonyinn.com/events/
+  kind: venue
+  strategy: html
+  lat: 40.801
+  lon: -80.126
+  address: 230 Mercer St, Harmony, PA
+  notes: Historic pub with regular live music on weekends.
+
+- id: burghers-zelienople
+  name: Burgh'ers Brewing Zelienople
+  url: https://www.burghersbrewing.com/events
+  kind: venue
+  strategy: html
+  lat: 40.794
+  lon: -80.137
+  address: Zelienople, PA
+  notes: Brewery with patio shows in season.
+
+- id: cranberry-township
+  name: Cranberry Township Parks & Events
+  url: https://www.cranberrytownship.org/calendar.aspx
+  kind: calendar
+  strategy: html
+  lat: 40.685
+  lon: -80.107
+  notes: Township calendar — summer concert series in the park, Community Days.
+
+- id: north-country-brewing
+  name: North Country Brewing
+  url: https://www.northcountrybrewing.com/events
+  kind: venue
+  strategy: html
+  lat: 41.064
+  lon: -80.056
+  address: 141 S Main St, Slippery Rock, PA
+  notes: Brewpub with frequent live acts; northern edge of the radius.
+
+- id: butler-county-tourism
+  name: Visit Butler County events
+  url: https://www.visitbutlercounty.com/events/
+  kind: aggregator
+  strategy: html
+  lat: 40.861
+  lon: -79.895
+  notes: County tourism calendar — catches fairs, wineries, small-town gigs.
+
+- id: moondogs
+  name: Moondog's
+  url: https://moondogs.us/
+  kind: venue
+  strategy: html
+  lat: 40.493
+  lon: -79.861
+  address: 378 Freeport Rd, Blawnox, PA
+  notes: Legendary blues bar; national blues acts in a tiny room.
