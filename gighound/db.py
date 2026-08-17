@@ -43,6 +43,12 @@ CREATE TABLE IF NOT EXISTS geocode_cache (
     lon REAL,
     resolved_at TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS pages (
+    source_id TEXT PRIMARY KEY,
+    content_hash TEXT NOT NULL,
+    last_llm_extracted_at TEXT
+);
 """
 
 
@@ -99,6 +105,26 @@ def upsert_event(conn: sqlite3.Connection, key: str, row: dict) -> bool:
         ),
     )
     return True
+
+
+def page_changed(conn: sqlite3.Connection, source_id: str, content_hash: str) -> bool:
+    """True if this source's page content differs from the last LLM extraction.
+
+    Gates the LLM fallback only — structured parsers are free and always run.
+    """
+    row = conn.execute(
+        "SELECT content_hash FROM pages WHERE source_id = ?", (source_id,)
+    ).fetchone()
+    return row is None or row["content_hash"] != content_hash
+
+
+def mark_page_extracted(conn: sqlite3.Connection, source_id: str, content_hash: str) -> None:
+    conn.execute(
+        "INSERT INTO pages (source_id, content_hash, last_llm_extracted_at) VALUES (?, ?, ?) "
+        "ON CONFLICT(source_id) DO UPDATE SET content_hash = excluded.content_hash, "
+        "last_llm_extracted_at = excluded.last_llm_extracted_at",
+        (source_id, content_hash, _now()),
+    )
 
 
 def log_crawl(

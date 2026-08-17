@@ -56,6 +56,14 @@ class ExtractedEvent(BaseModel):
         description="True only if this is a live music performance (not trivia, "
         "comedy, DJ-only, sports, or non-music events)"
     )
+    lat: Optional[float] = Field(
+        default=None,
+        description="Venue latitude, only if literal coordinates appear in the source",
+    )
+    lon: Optional[float] = Field(
+        default=None,
+        description="Venue longitude, only if literal coordinates appear in the source",
+    )
 
 
 class ExtractionResult(BaseModel):

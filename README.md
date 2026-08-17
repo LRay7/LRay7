@@ -17,9 +17,9 @@ Cranberry Township / North Hills corridor.
 sources/*.yaml          the source registry — one entry per venue site,
      │                  calendar, city-paper page, or API
      ▼
-gighound crawl          fetch each source (politely) → strip to text →
-     │                  Claude extracts structured events → geocode →
-     ▼                  dedupe (same show via 3 sources = 1 row) → SQLite
+gighound crawl          fetch each source (politely), then run it down
+     │                  the extraction ladder → geocode → dedupe
+     ▼                  (same show via 3 sources = 1 row) → SQLite
 data/gighound.db
      │
      ▼
@@ -27,15 +27,36 @@ gighound serve          FastAPI + one-page UI: "what's within N miles
                         of me tonight / this weekend?"
 ```
 
-The LLM extraction step is what makes this tractable: every venue formats its
-calendar differently, and one prompt replaces a hand-written scraper per site.
+### The extraction ladder (designed to cost $0)
+
+Each source is tried against progressively smarter — and only at the very end
+non-free — extractors:
+
+1. **Ticketmaster Discovery API** — free key; the arena/theater tier as JSON.
+2. **schema.org JSON-LD** — most venue sites embed their calendar as
+   machine-readable Event markup for SEO. Free, exact, no AI.
+3. **iCal feeds** — WordPress event calendars expose these. Free.
+4. **LLM fallback** — only for pages the parsers can't handle, and only when
+   the page's content hash changed since the last extraction. Runs through
+   `claude -p` (Claude Code headless) on your **existing Claude subscription**
+   — no API key — using Haiku, so it barely touches usage limits. Hard-capped
+   at `GIGHOUND_MAX_LLM_CALLS` per crawl (default 8).
+
+Knobs:
+
+| Env var | Default | Meaning |
+|---|---|---|
+| `GIGHOUND_EXTRACTOR` | `claude-cli` | `claude-cli` \| `api` \| `none` (structured-only, LLM fully off) |
+| `GIGHOUND_CLI_MODEL` | `haiku` | Model for the `claude -p` fallback |
+| `GIGHOUND_MAX_LLM_CALLS` | `8` | Hard cap on LLM calls per crawl run |
 
 ## Setup
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-cp .env.example .env   # add your ANTHROPIC_API_KEY
+# no API key needed — the LLM fallback uses the `claude` CLI you already have.
+# optional: cp .env.example .env for a TICKETMASTER_API_KEY (free tier)
 ```
 
 ## Usage

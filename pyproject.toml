@@ -7,13 +7,15 @@ dependencies = [
     "httpx>=0.27",
     "pyyaml>=6.0",
     "pydantic>=2.7",
-    "anthropic>=0.100",
     "fastapi>=0.111",
     "uvicorn>=0.30",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
+# Only needed for the opt-in pay-per-token API backend (GIGHOUND_EXTRACTOR=api).
+# The default claude-cli backend uses your Claude subscription instead.
+api = ["anthropic>=0.100"]
 
 [project.scripts]
 gighound = "gighound.cli:main"

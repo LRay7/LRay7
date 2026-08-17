@@ -60,3 +60,79 @@ def test_html_to_text_keeps_links():
     text = html_to_text(html)
     assert "junk" not in text
     assert "The Clarks (/show/1)" in text
+
+
+def test_jsonld_extraction():
+    from gighound.extract_structured import from_jsonld
+
+    html = """<html><head><script type="application/ld+json">
+    {"@context": "https://schema.org", "@graph": [
+      {"@type": "MusicEvent", "name": "Bluegrass Night",
+       "startDate": "2099-06-05T19:30:00-04:00",
+       "location": {"@type": "Place", "name": "The Strand",
+         "address": {"streetAddress": "119 N Main St", "addressLocality": "Zelienople"}},
+       "performer": {"@type": "MusicGroup", "name": "The Hillbenders"},
+       "offers": {"price": "15", "url": "https://tix.example/1"}},
+      {"@type": "Event", "name": "Trivia Tuesday", "startDate": "2099-06-02"},
+      {"@type": "Event", "name": "Acoustic Evening", "startDate": "1999-01-01"}
+    ]}</script></head></html>"""
+    events = from_jsonld(html)
+    assert len(events) == 2  # past event dropped
+    music = next(e for e in events if e.title == "Bluegrass Night")
+    assert music.is_live_music and music.artist == "The Hillbenders"
+    assert music.date == "2099-06-05" and music.start_time == "19:30"
+    assert music.venue_name == "The Strand"
+    assert "Zelienople" in music.venue_address
+    trivia = next(e for e in events if e.title == "Trivia Tuesday")
+    assert trivia.is_live_music is False
+
+
+def test_ics_extraction():
+    from gighound.extract_structured import from_ics, looks_like_ics
+
+    ics = (
+        "BEGIN:VCALENDAR\r\nVERSION:2.0\r\n"
+        "BEGIN:VEVENT\r\nSUMMARY:Jazz Trio\r\n"
+        "DTSTART;TZID=America/New_York:20990821T200000\r\n"
+        "LOCATION:Harmony Inn\r\nEND:VEVENT\r\n"
+        "BEGIN:VEVENT\r\nSUMMARY:Bingo Night\r\nDTSTART:20990822\r\nEND:VEVENT\r\n"
+        "END:VCALENDAR\r\n"
+    )
+    assert looks_like_ics(ics)
+    events = from_ics(ics)
+    assert len(events) == 2
+    jazz = events[0]
+    assert jazz.title == "Jazz Trio" and jazz.date == "2099-08-21"
+    assert jazz.start_time == "20:00" and jazz.venue_name == "Harmony Inn"
+    assert events[1].is_live_music is False  # bingo filtered by flag
+
+
+def test_ticketmaster_parse():
+    from gighound.ticketmaster import parse_response
+
+    data = {"_embedded": {"events": [{
+        "name": "The Avett Brothers",
+        "url": "https://www.ticketmaster.com/event/x",
+        "dates": {"start": {"localDate": "2099-09-12", "localTime": "19:00:00"}},
+        "classifications": [{"genre": {"name": "Folk"}}],
+        "priceRanges": [{"min": 45.0, "max": 89.5}],
+        "_embedded": {"venues": [{
+            "name": "Stage AE",
+            "address": {"line1": "400 North Shore Dr"},
+            "location": {"latitude": "40.4463", "longitude": "-80.0110"},
+        }]},
+    }]}}
+    events = parse_response(data)
+    assert len(events) == 1
+    ev = events[0]
+    assert ev.start_time == "19:00" and ev.genre == "folk"
+    assert ev.price == "$45–$90"
+    assert abs(ev.lat - 40.4463) < 1e-6
+
+
+def test_page_hash_gate(tmp_path: Path):
+    conn = db.connect(tmp_path / "gate.db")
+    assert db.page_changed(conn, "src", "hash1") is True
+    db.mark_page_extracted(conn, "src", "hash1")
+    assert db.page_changed(conn, "src", "hash1") is False
+    assert db.page_changed(conn, "src", "hash2") is True
