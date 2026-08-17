@@ -62,13 +62,8 @@ def extract_events(
 
 # --- claude-cli backend (subscription, no API key) ---------------------------
 
-def _extract_via_claude_cli(user_content: str) -> ExtractionResult:
-    schema = json.dumps(ExtractionResult.model_json_schema())
-    prompt = (
-        f"{SYSTEM}\n\n"
-        f"Respond with ONLY a JSON object matching this JSON Schema — no prose, "
-        f"no code fences:\n{schema}\n\n{user_content}"
-    )
+def run_claude_cli(prompt: str, extra_args: list[str] | None = None) -> str:
+    """Run `claude -p` headless and return the result text."""
     proc = subprocess.run(
         [
             "claude",
@@ -77,6 +72,7 @@ def _extract_via_claude_cli(user_content: str) -> ExtractionResult:
             config.CLAUDE_CLI_MODEL,
             "--output-format",
             "json",
+            *(extra_args or []),
         ],
         input=prompt,
         capture_output=True,
@@ -87,8 +83,26 @@ def _extract_via_claude_cli(user_content: str) -> ExtractionResult:
         raise RuntimeError(
             f"claude CLI failed (rc={proc.returncode}): {proc.stderr.strip()[:300]}"
         )
-    envelope = json.loads(proc.stdout)
-    result_text = envelope.get("result", "")
+    return parse_cli_envelope(proc.stdout)
+
+
+def parse_cli_envelope(stdout: str) -> str:
+    """Pull the result text out of `claude -p --output-format json` output."""
+    envelope = json.loads(stdout)
+    return envelope.get("result", "")
+
+
+def schema_instruction() -> str:
+    schema = json.dumps(ExtractionResult.model_json_schema())
+    return (
+        f"Respond with ONLY a JSON object matching this JSON Schema — no prose, "
+        f"no code fences:\n{schema}"
+    )
+
+
+def _extract_via_claude_cli(user_content: str) -> ExtractionResult:
+    prompt = f"{SYSTEM}\n\n{schema_instruction()}\n\n{user_content}"
+    result_text = run_claude_cli(prompt)
     return ExtractionResult.model_validate_json(_strip_fences(result_text))
 
 

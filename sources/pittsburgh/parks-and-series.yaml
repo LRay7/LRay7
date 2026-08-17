@@ -1,0 +1,40 @@
+# Free outdoor music: township parks, county series, city neighborhood concerts.
+# Exactly the events the big apps never list. All URLs best-effort (verified: false);
+# run `gighound sources check`.
+
+- id: citiparks-concerts
+  name: Pittsburgh Citiparks concerts
+  url: https://pittsburghpa.gov/citiparks/
+  kind: calendar
+  strategy: html
+  lat: 40.441
+  lon: -79.996
+  notes: City neighborhood series - Reservoir of Jazz (Highland Park), Bach
+    Beethoven and Brunch (Mellon Park), etc. Find the exact summer-events page.
+
+- id: zelienople-park
+  name: Zelienople Community Park concerts
+  url: https://www.zelienopleboro.com/
+  kind: calendar
+  strategy: html
+  lat: 40.794
+  lon: -80.137
+  notes: Borough amphitheater summer series. Locate the events/park page.
+
+- id: adams-township
+  name: Adams Township parks events (Mars)
+  url: https://www.adamstwp.org/
+  kind: calendar
+  strategy: html
+  lat: 40.696
+  lon: -80.012
+  notes: Community park concerts in season.
+
+- id: pine-township
+  name: Pine Community Center events (Wexford)
+  url: https://twp.pine.pa.us/
+  kind: calendar
+  strategy: html
+  lat: 40.632
+  lon: -80.055
+  notes: Township concerts and community events.

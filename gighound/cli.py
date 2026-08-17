@@ -70,6 +70,20 @@ def cmd_events(args) -> int:
     return 0
 
 
+def cmd_add_flyer(args) -> int:
+    from . import flyer
+
+    rc = 0
+    for image in args.images:
+        try:
+            for line in flyer.add_flyer(image, venue_hint=args.venue):
+                print(line)
+        except Exception as e:
+            print(f"{image}: FAILED — {e}", file=sys.stderr)
+            rc = 1
+    return rc
+
+
 def cmd_serve(args) -> int:
     import uvicorn
 
@@ -97,6 +111,13 @@ def main() -> None:
     ep.add_argument("--radius", type=float, default=config.DEFAULT_RADIUS_MILES)
     ep.add_argument("--days", type=int, default=7)
     ep.set_defaults(func=cmd_events)
+
+    fp = sub.add_parser(
+        "add-flyer", help="parse a gig-flyer screenshot into events (Claude vision)"
+    )
+    fp.add_argument("images", nargs="+", help="flyer image file(s)")
+    fp.add_argument("--venue", help="venue hint when the flyer doesn't name it")
+    fp.set_defaults(func=cmd_add_flyer)
 
     vp = sub.add_parser("serve", help="run the web UI")
     vp.add_argument("--port", type=int, default=8000)

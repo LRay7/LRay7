@@ -130,6 +130,38 @@ def test_ticketmaster_parse():
     assert abs(ev.lat - 40.4463) < 1e-6
 
 
+def test_cli_envelope_and_fence_stripping():
+    from gighound.extract import _strip_fences, parse_cli_envelope
+
+    stdout = '{"type":"result","result":"```json\\n{\\"events\\": [], \\"page_has_event_listings\\": false}\\n```"}'
+    text = parse_cli_envelope(stdout)
+    assert _strip_fences(text) == '{"events": [], "page_has_event_listings": false}'
+
+
+def test_flyer_venue_hint_applied(tmp_path: Path, monkeypatch):
+    from gighound import flyer
+    from gighound.models import ExtractedEvent, ExtractionResult
+
+    img = tmp_path / "flyer.png"
+    img.write_bytes(b"\x89PNG fake")
+    monkeypatch.setenv("GIGHOUND_DB_PATH", str(tmp_path / "flyer.db"))
+    monkeypatch.setattr(
+        flyer,
+        "parse_flyer",
+        lambda *a, **k: ExtractionResult(
+            events=[ExtractedEvent(title="Porch Band", date="2099-07-04", is_live_music=True)],
+            page_has_event_listings=True,
+        ),
+    )
+    # DB path is read at connect time via config; patch config to be safe.
+    from gighound import config as cfg
+
+    monkeypatch.setattr(cfg, "DB_PATH", tmp_path / "flyer.db")
+    lines = flyer.add_flyer(img, venue_hint="North Park Lounge")
+    assert any("North Park Lounge" in line for line in lines)
+    assert any("1 new" in line for line in lines)
+
+
 def test_page_hash_gate(tmp_path: Path):
     conn = db.connect(tmp_path / "gate.db")
     assert db.page_changed(conn, "src", "hash1") is True

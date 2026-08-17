@@ -110,3 +110,146 @@
   enabled: false
   notes: Free API key covers the arena/theater tier wholesale. Enable after
     setting TICKETMASTER_API_KEY; strategy needs env-var substitution (TODO).
+
+# --- Bars, breweries, clubs: the long tail -----------------------------------
+
+- id: grist-house
+  name: Grist House Craft Brewery
+  url: https://www.gristhouse.com/
+  kind: venue
+  strategy: html
+  lat: 40.480
+  lon: -79.977
+  address: 10 E Sherman St, Millvale, PA
+  notes: Big taproom yard; live music in season.
+
+- id: trace-brewing
+  name: Trace Brewing
+  url: https://www.tracebloomfield.com/
+  kind: venue
+  strategy: html
+  lat: 40.462
+  lon: -79.947
+  address: 4312 Main St, Bloomfield, PA
+  notes: Frequent shows and DJ nights; filter keeps only live music.
+
+- id: spirit
+  name: Spirit
+  url: https://www.spiritpgh.com/
+  kind: venue
+  strategy: html
+  lat: 40.4655
+  lon: -79.9605
+  address: 242 51st St, Lawrenceville, PA
+  notes: Hall + lodge rooms, eclectic bookings.
+
+- id: park-house
+  name: The Park House
+  url: https://www.parkhousepgh.com/
+  kind: venue
+  strategy: html
+  lat: 40.454
+  lon: -80.003
+  address: 403 E Ohio St, North Side, PA
+  notes: Oldest bar in Pittsburgh; famous free bluegrass nights. If the site
+    has no calendar, prime flyer-inbox candidate.
+
+- id: con-alma
+  name: Con Alma
+  url: https://www.conalmapgh.com/
+  kind: venue
+  strategy: html
+  lat: 40.451
+  lon: -79.932
+  address: 5884 Ellsworth Ave, Shadyside, PA
+  notes: Jazz club/restaurant; live jazz most nights.
+
+- id: city-of-asylum
+  name: City of Asylum @ Alphabet City
+  url: https://alphabetcity.org/events/
+  kind: venue
+  strategy: html
+  lat: 40.454
+  lon: -80.010
+  address: 40 W North Ave, North Side, PA
+  notes: Free jazz and world-music concerts; reservation links.
+
+- id: bottlerocket
+  name: Bottlerocket Social Hall
+  url: https://bottlerocketpgh.com/
+  kind: venue
+  strategy: html
+  lat: 40.417
+  lon: -79.994
+  address: 1226 Arlington Ave, Allentown, PA
+  notes: Retro social hall; bands, honky-tonk nights.
+
+- id: crafthouse
+  name: Crafthouse Stage & Grill
+  url: https://www.crafthousepgh.com/
+  kind: venue
+  strategy: html
+  lat: 40.370
+  lon: -79.966
+  address: 5024 Curry Rd, Baldwin, PA
+  notes: South Hills rock/tribute room.
+
+- id: carnegie-homestead
+  name: Carnegie of Homestead Music Hall
+  url: https://librarymusichall.com/
+  kind: venue
+  strategy: html
+  lat: 40.392
+  lon: -79.900
+  address: 510 E 10th Ave, Munhall, PA
+  notes: 1,000-seat historic hall; national touring acts.
+
+- id: helicon-brewing
+  name: Helicon Brewing
+  url: https://www.heliconbrewing.com/
+  kind: venue
+  strategy: html
+  lat: 40.398
+  lon: -80.185
+  address: 102 Union Ave, Oakdale, PA
+  notes: West-suburb brewery with regular live music.
+
+- id: cobblehaus
+  name: Cobblehaus Brewing
+  url: https://www.cobblehaus.com/
+  kind: venue
+  strategy: html
+  lat: 40.518
+  lon: -80.166
+  address: 1021 Fifth Ave, Coraopolis, PA
+  notes: West-suburb brewery; weekend acts.
+
+- id: lamp-theatre
+  name: The Lamp Theatre
+  url: https://lamptheatre.org/
+  kind: venue
+  strategy: html
+  lat: 40.324
+  lon: -79.701
+  address: 222 Main St, Irwin, PA
+  notes: Restored small theater, eastern edge of the radius.
+
+# --- More aggregators --------------------------------------------------------
+
+- id: visit-pittsburgh
+  name: Visit Pittsburgh events
+  url: https://www.visitpittsburgh.com/events/
+  kind: aggregator
+  strategy: html
+  lat: 40.441
+  lon: -79.996
+  notes: Tourism calendar; broad, includes festivals and free series.
+
+- id: pittsburgh-magazine
+  name: Pittsburgh Magazine events
+  url: https://www.pittsburghmagazine.com/events/
+  kind: aggregator
+  strategy: html
+  lat: 40.441
+  lon: -79.996
+  notes: Curated weekly picks; good signal, low noise.

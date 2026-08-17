@@ -62,12 +62,13 @@ pip install -e ".[dev]"
 ## Usage
 
 ```bash
-gighound sources list        # show the registry
+gighound sources list        # show the registry (38 sources and counting)
 gighound sources check       # ping every source URL — fix broken seeds first!
-gighound crawl               # crawl everything (LLM extraction; costs pennies)
+gighound crawl               # run everything down the extraction ladder
 gighound crawl --source jergels   # or just one
 gighound events              # list upcoming shows near Cranberry Twp
 gighound events --radius 30 --days 3
+gighound add-flyer shot.png --venue "North Park Lounge"   # parse a gig flyer
 gighound serve               # web UI at http://localhost:8000
 ```
 
@@ -95,9 +96,10 @@ Scope is just the length of this list.
 
 - [ ] Verify/fix all seed source URLs (`gighound sources check`)
 - [ ] Scheduled crawls (cron / GitHub Actions)
-- [ ] **Flyer inbox** — drop a screenshot of an Instagram/Facebook gig flyer
-      and have Claude vision (via `claude -p`) parse it into an event. The
-      practical answer for social-only venues.
+- [x] **Flyer inbox** (CLI) — `gighound add-flyer shot.png` parses a
+      screenshot of an Instagram/Facebook gig flyer via Claude vision
+      (`claude -p`, subscription, no API key). Untested against the live CLI —
+      exercise it on first run. Web-UI drag-and-drop still to come.
 - [ ] RSS-Bridge experiment for public Facebook pages (flaky but free)
 - [ ] Genre filters in the UI; "notify me" for favorite venues/artists
 - [ ] JS-rendered calendars (Playwright fallback for sites that need it)
