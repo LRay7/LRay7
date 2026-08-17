@@ -81,3 +81,17 @@
   lon: -79.861
   address: 378 Freeport Rd, Blawnox, PA
   notes: Legendary blues bar; national blues acts in a tiny room.
+
+- id: north-park-lounge
+  name: North Park Lounge
+  url: https://www.northparklounge.com/
+  kind: venue
+  strategy: html
+  lat: 40.596
+  lon: -80.010
+  address: North Park, PA
+  notes: Local chain (North Park, Cranberry, McCandless locations) known for
+    weekend live music, announced mostly via Facebook. URL and coordinates are
+    best-effort guesses - verify the site's entertainment page and per-location
+    URLs with 'gighound sources check'. If the site doesn't list gigs, this is
+    a prime candidate for the social/flyer-inbox path.

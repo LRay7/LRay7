@@ -94,12 +94,23 @@ Scope is just the length of this list.
 ## Roadmap
 
 - [ ] Verify/fix all seed source URLs (`gighound sources check`)
-- [ ] Ticketmaster Discovery API strategy (arena/theater tier for free)
 - [ ] Scheduled crawls (cron / GitHub Actions)
-- [ ] Facebook/Instagram: no public events API — investigate per-venue
-      workarounds (venue sites usually mirror FB events; some embed widgets)
+- [ ] **Flyer inbox** — drop a screenshot of an Instagram/Facebook gig flyer
+      and have Claude vision (via `claude -p`) parse it into an event. The
+      practical answer for social-only venues.
+- [ ] RSS-Bridge experiment for public Facebook pages (flaky but free)
 - [ ] Genre filters in the UI; "notify me" for favorite venues/artists
 - [ ] JS-rendered calendars (Playwright fallback for sites that need it)
+
+## Social-media-only venues
+
+Some bars announce gigs only on Facebook/Instagram (e.g. North Park Lounge).
+There is no public Meta events API, and page scraping is login-walled and
+ToS-hostile — that's *the* reason no existing app covers these well. GigHound's
+strategy, in order: (1) the venue's own website usually mirrors the FB posts;
+(2) aggregators (City Paper, WYEP) catch cross-posted gigs; (3) RSS-Bridge for
+public pages; (4) the flyer inbox — a human screenshots the post, the app does
+the rest.
 
 ## Known limitations
 
