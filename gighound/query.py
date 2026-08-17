@@ -14,6 +14,30 @@ def haversine_miles(lat1: float, lon1: float, lat2: float, lon2: float) -> float
     return 2 * r * math.asin(math.sqrt(a))
 
 
+def export_json(conn: sqlite3.Connection, out_path, days: int = 90) -> int:
+    """Dump all upcoming events (with coordinates) to a JSON file the web UI
+    can load statically — lets a scheduled crawl publish results with no server.
+    Returns the number of events exported."""
+    import json
+    from pathlib import Path
+
+    start = date.today().isoformat()
+    end = (date.today() + timedelta(days=days)).isoformat()
+    rows = [
+        dict(r)
+        for r in conn.execute(
+            "SELECT * FROM events WHERE date >= ? AND date <= ? "
+            "AND lat IS NOT NULL ORDER BY date, start_time",
+            (start, end),
+        )
+    ]
+    payload = {"generated": start, "count": len(rows), "events": rows}
+    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w") as f:
+        json.dump(payload, f, indent=1)
+    return len(rows)
+
+
 def events_near(
     conn: sqlite3.Connection,
     lat: float,

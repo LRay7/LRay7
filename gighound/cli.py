@@ -70,6 +70,14 @@ def cmd_events(args) -> int:
     return 0
 
 
+def cmd_export(args) -> int:
+    conn = db.connect()
+    n = query.export_json(conn, args.out, days=args.days)
+    conn.close()
+    print(f"exported {n} events to {args.out}")
+    return 0
+
+
 def cmd_add_flyer(args) -> int:
     from . import flyer
 
@@ -111,6 +119,15 @@ def main() -> None:
     ep.add_argument("--radius", type=float, default=config.DEFAULT_RADIUS_MILES)
     ep.add_argument("--days", type=int, default=7)
     ep.set_defaults(func=cmd_events)
+
+    xp = sub.add_parser(
+        "export", help="write upcoming events to web/static/events.json"
+    )
+    xp.add_argument(
+        "--out", default=str(config.REPO_ROOT / "web" / "static" / "events.json")
+    )
+    xp.add_argument("--days", type=int, default=90)
+    xp.set_defaults(func=cmd_export)
 
     fp = sub.add_parser(
         "add-flyer", help="parse a gig-flyer screenshot into events (Claude vision)"

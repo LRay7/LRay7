@@ -168,3 +168,54 @@ def test_page_hash_gate(tmp_path: Path):
     db.mark_page_extracted(conn, "src", "hash1")
     assert db.page_changed(conn, "src", "hash1") is False
     assert db.page_changed(conn, "src", "hash2") is True
+
+
+def test_export_json(tmp_path: Path):
+    import json
+    from datetime import date
+
+    from gighound.query import export_json
+
+    conn = db.connect(tmp_path / "exp.db")
+    row = {
+        "title": "Export Band", "artist": "Export Band",
+        "date": date.today().isoformat(), "venue_name": "Jergel's",
+        "lat": 40.654, "lon": -80.096, "source_id": "jergels",
+    }
+    db.upsert_event(conn, dedupe_key("Export Band", None, "Jergel's", row["date"]), row)
+    conn.commit()
+
+    out = tmp_path / "events.json"
+    n = export_json(conn, out)
+    assert n == 1
+    data = json.loads(out.read_text())
+    assert data["count"] == 1
+    assert data["events"][0]["artist"] == "Export Band"
+    assert data["events"][0]["lat"] == 40.654
+
+
+def test_flyer_upload_endpoint(tmp_path: Path, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from gighound import flyer
+    from web.app import app
+
+    monkeypatch.setattr(
+        flyer, "add_flyer", lambda path, venue_hint=None: [f"stored 1 event ({venue_hint})"]
+    )
+    client = TestClient(app)
+
+    resp = client.post(
+        "/api/flyer",
+        files={"file": ("flyer.png", b"\x89PNG fake", "image/png")},
+        data={"venue": "North Park Lounge"},
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["ok"] is True
+    assert "North Park Lounge" in body["lines"][0]
+
+    bad = client.post(
+        "/api/flyer", files={"file": ("f.pdf", b"%PDF", "application/pdf")}
+    )
+    assert bad.json()["ok"] is False

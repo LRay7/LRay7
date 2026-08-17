@@ -1,0 +1,70 @@
+# Scheduled crawl — free tier by design.
+#
+# Runs the extraction ladder with the LLM OFF (GIGHOUND_EXTRACTOR=none): only
+# the structured parsers (JSON-LD, iCal, Ticketmaster) run in CI, so this
+# workflow needs no Anthropic credentials and costs nothing. Pages that need
+# LLM extraction are picked up when you run `gighound crawl` locally, where
+# the claude-cli backend uses your subscription.
+#
+# The SQLite DB (dedupe/first_seen state + geocode cache) is carried between
+# runs via actions/cache; the publishable result is web/static/events.json,
+# committed back to the repo when it changes.
+#
+# Optional: add a TICKETMASTER_API_KEY repo secret and enable the
+# ticketmaster-pgh source to get the arena/theater tier in every run.
+
+name: crawl
+
+on:
+  schedule:
+    - cron: "0 10 * * *"   # daily, 10:00 UTC (morning in Pittsburgh)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: crawl
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -e .
+
+      - name: Restore crawl state
+        uses: actions/cache@v4
+        with:
+          path: data
+          key: gighound-db-${{ github.run_id }}
+          restore-keys: |
+            gighound-db-
+
+      - name: Crawl (structured parsers only)
+        env:
+          GIGHOUND_EXTRACTOR: none
+          TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
+        run: gighound crawl
+
+      - name: Export events.json
+        run: gighound export
+
+      - name: Commit updated events
+        run: |
+          git config user.name "gighound-crawler"
+          git config user.email "actions@users.noreply.github.com"
+          git add web/static/events.json
+          if git diff --cached --quiet; then
+            echo "no event changes"
+          else
+            git commit -m "crawl: update events.json"
+            git push
+          fi

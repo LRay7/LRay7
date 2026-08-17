@@ -108,8 +108,10 @@
   lat: 40.441
   lon: -79.996
   enabled: false
-  notes: Free API key covers the arena/theater tier wholesale. Enable after
-    setting TICKETMASTER_API_KEY; strategy needs env-var substitution (TODO).
+  notes: Free API key covers the arena/theater tier wholesale. Set
+    TICKETMASTER_API_KEY (locally or as a GitHub Actions secret) and flip
+    enabled to true. The url field is informational - the strategy module
+    builds its own request.
 
 # --- Bars, breweries, clubs: the long tail -----------------------------------
 

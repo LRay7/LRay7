@@ -95,11 +95,14 @@ Scope is just the length of this list.
 ## Roadmap
 
 - [ ] Verify/fix all seed source URLs (`gighound sources check`)
-- [ ] Scheduled crawls (cron / GitHub Actions)
-- [x] **Flyer inbox** (CLI) — `gighound add-flyer shot.png` parses a
-      screenshot of an Instagram/Facebook gig flyer via Claude vision
-      (`claude -p`, subscription, no API key). Untested against the live CLI —
-      exercise it on first run. Web-UI drag-and-drop still to come.
+- [x] Scheduled crawls — `.github/workflows/crawl.yml` runs daily on the free
+      Actions tier with the LLM off (structured parsers only), carries the DB
+      via cache, and commits `web/static/events.json` when it changes. The web
+      page automatically falls back to that snapshot when no server is running.
+- [x] **Flyer inbox** — `gighound add-flyer shot.png` on the CLI, or drag a
+      screenshot onto the web page. Claude vision parses it via `claude -p`
+      (subscription, no API key). Untested against the live CLI — exercise it
+      on first run.
 - [ ] RSS-Bridge experiment for public Facebook pages (flaky but free)
 - [ ] Genre filters in the UI; "notify me" for favorite venues/artists
 - [ ] JS-rendered calendars (Playwright fallback for sites that need it)
